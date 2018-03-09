@@ -6,6 +6,13 @@ import sys
 
 BUF_SIZE = 65536
 
+class UniqueFile():
+	def __init__(self, hash, location):
+		self.hash = hash
+		self.location = location
+		self.duplicates = []
+
+
 def populateFileList(dirpath):
 	file_list = []
 	for(directory, dirnames, filenames) in walk(dirpath):
@@ -14,9 +21,8 @@ def populateFileList(dirpath):
 	return file_list
 
 
-def obtainDuplicates(file_list) :
+def obtainUniqueFiles(file_list) :
 	unique_files = {}
-	duplicate_files = []
 	for s in file_list :
 		md5 = hashlib.md5()
 		with open(s, 'rb') as file :
@@ -26,17 +32,18 @@ def obtainDuplicates(file_list) :
 					break
 				md5.update(data)
 		theMd5 = "{0}".format(md5.hexdigest())
-		if(unique_files.get(theMd5, "NONE") == "NONE"):
-			unique_files[theMd5] = s
+		present_unique_file = unique_files.get(theMd5, None)
+		if(present_unique_file == None):
+			unique_file = UniqueFile(theMd5, s)
+			unique_files[theMd5] = unique_file
 		else :
-			duplicate_files.append(s)
-	#for md5value, fileLocation in unique_files.items():
-		#print(md5value, " ", fileLocation)
-	return duplicate_files
+			present_unique_file.duplicates.append(s)
+	return list(unique_files.values())
 
-def deleteFiles(duplicate_files):
-	for filepath in duplicate_files :
-		os.remove(filepath)
+def deleteFiles(unique_files):
+	for unique_file in unique_files :
+		for filepath in unique_file.duplicates :
+			os.remove(filepath)
 
 
 if(__name__ == "__main__"):
@@ -45,13 +52,21 @@ if(__name__ == "__main__"):
 		print("Obtaining Files")
 		file_list = populateFileList(dirpath)
 		print("There are ", len(file_list), " files in total")
-		redundant_files = obtainDuplicates(file_list)
-		number_of_duplicates = len(redundant_files)
-		print("There are ", number_of_duplicates, " duplicated files")
+		unique_files = obtainUniqueFiles(file_list)
+		number_of_duplicates = 0
+		number_of_files_with_duplicates = 0
+		for unique_file in unique_files :
+			duplicates_for_this_file = len(unique_file.duplicates)
+			if(duplicates_for_this_file > 0) :
+				number_of_duplicates = number_of_duplicates + duplicates_for_this_file
+				print(unique_file.location, " has ", duplicates_for_this_file, " duplicates. ", unique_file.duplicates)
+				number_of_files_with_duplicates = number_of_files_with_duplicates + 1
+		print("There are ", number_of_files_with_duplicates, " files that have duplicates")
+		print("There are ", number_of_duplicates, " duplicates that can be deleted")
 		if(number_of_duplicates > 0):
-			user_input = str(input("Do you want to delete these duplicate files? (y/n): ")).lower()
+			user_input = str(input("Do you want to delete all of these duplicate files? (y/n): ")).lower()
 			if(user_input == "y"):
 				print("Deleting Files")
-				deleteFiles(redundant_files)
+				deleteFiles(unique_files)
 	else:
 		print("Please enter a valid directory")
