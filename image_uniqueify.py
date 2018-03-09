@@ -50,7 +50,7 @@ def delete_files(unique_files):
 
 if(__name__ == "__main__"):
 	dirpath = sys.argv[1]
-	if(os.path.exists(dirpath) && os.path.isdir(dirpath)):
+	if(os.path.exists(dirpath) and os.path.isdir(dirpath)):
 		print("Obtaining Files")
 		file_list = populate_file_list(dirpath)
 		print("There are ", len(file_list), " files in total")
@@ -72,3 +72,4 @@ if(__name__ == "__main__"):
 				delete_files(unique_files)
 	else:
 		print("Please enter a valid directory")
+		sys.exit(1)
