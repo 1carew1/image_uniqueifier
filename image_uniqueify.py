@@ -13,7 +13,7 @@ class UniqueFile():
 		self.duplicates = []
 
 
-def populateFileList(dirpath):
+def populate_file_list(dirpath):
 	file_list = []
 	for(directory, dirnames, filenames) in walk(dirpath):
 		for filename in filenames:
@@ -21,7 +21,7 @@ def populateFileList(dirpath):
 	return file_list
 
 
-def obtainUniqueFiles(file_list) :
+def obtain_unique_files(file_list) :
 	unique_files = {}
 	for s in file_list :
 		md5 = hashlib.md5()
@@ -40,19 +40,19 @@ def obtainUniqueFiles(file_list) :
 			present_unique_file.duplicates.append(s)
 	return list(unique_files.values())
 
-def deleteFiles(unique_files):
+def delete_files(unique_files):
 	for unique_file in unique_files :
 		for filepath in unique_file.duplicates :
 			os.remove(filepath)
-
+		unique_file.duplicates = []
 
 if(__name__ == "__main__"):
 	dirpath = sys.argv[1]
 	if(os.path.exists(dirpath)):
 		print("Obtaining Files")
-		file_list = populateFileList(dirpath)
+		file_list = populate_file_list(dirpath)
 		print("There are ", len(file_list), " files in total")
-		unique_files = obtainUniqueFiles(file_list)
+		unique_files = obtain_unique_files(file_list)
 		number_of_duplicates = 0
 		number_of_files_with_duplicates = 0
 		for unique_file in unique_files :
@@ -67,6 +67,6 @@ if(__name__ == "__main__"):
 			user_input = str(input("Do you want to delete all of these duplicate files? (y/n): ")).lower()
 			if(user_input == "y"):
 				print("Deleting Files")
-				deleteFiles(unique_files)
+				delete_files(unique_files)
 	else:
 		print("Please enter a valid directory")
