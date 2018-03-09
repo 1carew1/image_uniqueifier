@@ -1,8 +1,7 @@
+import os
 from os import walk
 import sys
 import hashlib
-import os
-import sys
 
 BUF_SIZE = 65536
 
