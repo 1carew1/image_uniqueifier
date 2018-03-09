@@ -21,17 +21,20 @@ def populate_file_list(dirpath):
 	return file_list
 
 
+def calculate_file_hash(file_loc):
+	md5 = hashlib.md5()
+	with open(file_loc, 'rb') as file :
+		while(True):
+			data = file.read(BUF_SIZE)
+			if not data:
+				break
+			md5.update(data)
+	return "{0}".format(md5.hexdigest())
+
 def obtain_unique_files(file_list) :
 	unique_files = {}
 	for s in file_list :
-		md5 = hashlib.md5()
-		with open(s, 'rb') as file :
-			while(True):
-				data = file.read(BUF_SIZE)
-				if not data:
-					break
-				md5.update(data)
-		theMd5 = "{0}".format(md5.hexdigest())
+		theMd5 = calculate_file_hash(s)
 		present_unique_file = unique_files.get(theMd5, None)
 		if(present_unique_file == None):
 			unique_file = UniqueFile(theMd5, s)
