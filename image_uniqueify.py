@@ -33,11 +33,11 @@ def calculate_file_hash(file_loc):
 def obtain_unique_files(file_list) :
 	unique_files = {}
 	for s in file_list :
-		theMd5 = calculate_file_hash(s)
-		present_unique_file = unique_files.get(theMd5, None)
+		the_md5 = calculate_file_hash(s)
+		present_unique_file = unique_files.get(the_md5, None)
 		if(present_unique_file == None):
-			unique_file = UniqueFile(theMd5, s)
-			unique_files[theMd5] = unique_file
+			unique_file = UniqueFile(the_md5, s)
+			unique_files[the_md5] = unique_file
 		else :
 			present_unique_file.duplicates.append(s)
 	return list(unique_files.values())
